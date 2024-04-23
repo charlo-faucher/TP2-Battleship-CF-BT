@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('type_id');
             $table->unsignedBigInteger('partie_id');
-            $table->string('coordonnee');
             $table->timestamps();
 
             $table->foreign('type_id')

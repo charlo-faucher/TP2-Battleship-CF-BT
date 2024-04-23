@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('coordonnees_bateaux', function (Blueprint $table) {
+        Schema::create('coordonnees_bateaux_adversaires', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('partie_id');
             $table->string('coordonnee');
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('positions_bateaux');
+        Schema::dropIfExists('coordonnees_bateaux_adversaires');
     }
 };
