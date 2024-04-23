@@ -11,17 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('bateaux', function (Blueprint $table) {
+        Schema::create('coordonnees_bateaux', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('type_id');
             $table->unsignedBigInteger('partie_id');
-            $table->boolean('est_coule');
+            $table->string('coordonnee');
+            $table->boolean('resultat')->nullable();
             $table->timestamps();
-
-            $table->foreign('type_id')
-                ->references('id')
-                ->on('types_bateaux')
-                ->onDelete('cascade');
 
             $table->foreign('partie_id')
                 ->references('id')
@@ -35,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('bateaux');
+        Schema::dropIfExists('positions_bateaux');
     }
 };

@@ -8,20 +8,11 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class PartieController extends Controller
 {
-    public function index() : JsonResponse
+    public function store() : JsonResponse
     {
         return response()->json([]);
     }
 
-    public function destroy(Request $request) : JsonResponse
-    {
-        return response()->json([]);
-    }
-
-    public function spect(Request $request) : JsonResponse
-    {
-        return response()->json([]);
-    }
 
     public function fire(Request $request) : JsonResponse
     {
@@ -29,6 +20,11 @@ class PartieController extends Controller
     }
 
     public function resultat(Request $request) : JsonResponse
+    {
+        return response()->json([]);
+    }
+
+    public function destroy(Request $request) : JsonResponse
     {
         return response()->json([]);
     }
