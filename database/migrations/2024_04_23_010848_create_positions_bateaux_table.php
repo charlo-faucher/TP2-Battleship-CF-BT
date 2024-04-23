@@ -11,10 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('parties', function (Blueprint $table) {
+        Schema::create('positions_bateaux', function (Blueprint $table) {
             $table->id();
-            $table->boolean('est_finie');
+            $table->unsignedBigInteger('partie_id');
+            $table->string('position');
+            $table->boolean('est_touche');
             $table->timestamps();
+
+            $table->foreign('partie_id')
+                ->references('id')
+                ->on('parties')
+                ->onDelete('cascade');
         });
     }
 
@@ -23,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('parties');
+        Schema::dropIfExists('positions_bateaux');
     }
 };

@@ -11,9 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('parties', function (Blueprint $table) {
+        Schema::create('types_bateaux', function (Blueprint $table) {
             $table->id();
-            $table->boolean('est_finie');
+            $table->string('nom');
+            $table->integer('taille');
             $table->timestamps();
         });
     }
@@ -23,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('parties');
+        Schema::dropIfExists('types_bateaux');
     }
 };
