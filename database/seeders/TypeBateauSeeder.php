@@ -17,8 +17,8 @@ class TypeBateauSeeder extends Seeder
             ['nom' => 'porte-avions', 'taille' => 5],
             ['nom' => 'cuirasse', 'taille' => 4],
             ['nom' => 'destroyer', 'taille' => 3],
-            ['nom' => 'sous-marin', 'taille' => 2],
-            ['nom' => 'patrouilleur', 'taille' => 1],
+            ['nom' => 'sous-marin', 'taille' => 3],
+            ['nom' => 'patrouilleur', 'taille' => 2],
         ];
 
         foreach ($types as $type) {

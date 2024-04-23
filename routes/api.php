@@ -11,8 +11,7 @@ Route::get('/user', function (Request $request) {
 Route::prefix('partie')
     ->controller(PartieController::class)
     ->group(function () {
-        Route::get('/{id}', 'spect');
-        Route::post('/', 'index');
+        Route::post('/', 'store');
         Route::post('/{id}/missile', 'fire');
         Route::post('/{id}/missile/{coordonée}', 'resultat');
         Route::delete('/{id}', 'destroy');
