@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('parties', function (Blueprint $table) {
             $table->id();
-            $table->string('adversaire');
-            $table->boolean('est_finie');
+            $table->string('adversaire', 30);
+            $table->boolean('est_finie')->default(false);
             $table->timestamps();
         });
     }

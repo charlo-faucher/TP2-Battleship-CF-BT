@@ -10,9 +10,15 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class PartieController extends Controller
 {
-    public function store() : PartieResource
+    public function store(Request $request) : PartieResource
     {
-        return new PartieResource(Partie::create(request()->all()));
+        $partie = Partie::create([
+                'adversaire' => $request->adversaire,
+            ]
+        );
+
+
+        return new PartieResource($partie);
     }
 
 

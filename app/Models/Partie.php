@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Partie extends Model
 {
+    protected $fillable = ['adversaire'];
 
     public function bateauxOrdinateur() : HasMany
     {

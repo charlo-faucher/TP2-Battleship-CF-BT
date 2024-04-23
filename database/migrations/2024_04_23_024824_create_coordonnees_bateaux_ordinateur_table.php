@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('partie_id');
             $table->unsignedBigInteger('bateau_id');
-            $table->string('coordonnee');
+            $table->string('coordonnee', 4);
             $table->timestamps();
 
             $table->foreign('partie_id')

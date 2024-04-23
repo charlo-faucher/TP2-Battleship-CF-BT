@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('coordonnees_bateaux_adversaires', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('partie_id');
-            $table->string('coordonnee');
-            $table->boolean('resultat')->nullable();
+            $table->string('coordonnee', 4);
+            $table->boolean('est_touche')->nullable();
             $table->timestamps();
 
             $table->foreign('partie_id')
