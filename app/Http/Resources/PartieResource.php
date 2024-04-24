@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources;
 
+use App\Models\BateauOrdinateur;
+use App\Models\TypeBateau;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -14,9 +16,16 @@ class PartieResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $bateauxPositions = [];
+
+        foreach ($this->bateauxOrdinateur as $bateau) {
+            $bateauxPositions[$bateau->type->nom] = $bateau->coordonnees->pluck('coordonnee')->toArray();
+        }
+
         return [
             'id' => $this->id,
             'adversaire' => $this->adversaire,
+            'bateaux' => $bateauxPositions,
             'created_at' => $this->created_at
         ];
     }

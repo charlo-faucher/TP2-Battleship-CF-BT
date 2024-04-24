@@ -13,15 +13,9 @@ return new class extends Migration
     {
         Schema::create('coordonnees_bateaux_ordinateur', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('partie_id');
             $table->unsignedBigInteger('bateau_id');
             $table->string('coordonnee', 4);
             $table->timestamps();
-
-            $table->foreign('partie_id')
-                ->references('id')
-                ->on('parties')
-                ->onDelete('cascade');
 
             $table->foreign('bateau_id')
                 ->references('id')

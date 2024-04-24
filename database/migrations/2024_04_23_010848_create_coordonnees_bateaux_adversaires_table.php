@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('partie_id');
             $table->string('coordonnee', 4);
-            $table->boolean('est_touche')->nullable();
+            $table->tinyInteger('resultat')->nullable();
             $table->timestamps();
 
             $table->foreign('partie_id')

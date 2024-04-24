@@ -12,7 +12,7 @@ Route::prefix('parties')
     ->controller(PartieController::class)
     ->group(function () {
         Route::post('/', 'store');
-        Route::post('/{id}/missile', 'fire');
-        Route::post('/{id}/missile/{coordonée}', 'resultat');
+        Route::post('/{id}/missiles', 'fire');
+        Route::post('/{id}/missiles/{coordonnee}', 'resultat');
         Route::delete('/{id}', 'destroy');
     });

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('type_id');
             $table->unsignedBigInteger('partie_id');
-            $table->boolean('est_coule');
+            $table->boolean('est_coule')->default(false);
             $table->timestamps();
 
             $table->foreign('type_id')
