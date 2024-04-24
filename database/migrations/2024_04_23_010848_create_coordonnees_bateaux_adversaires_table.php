@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('partie_id');
             $table->string('coordonnee', 4);
             $table->tinyInteger('resultat')->nullable();
+            $table->boolean('prochain_coup_target_mode')->default(false);
             $table->timestamps();
 
             $table->foreign('partie_id')

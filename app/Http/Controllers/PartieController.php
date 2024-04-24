@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Algorithmes\OffenseBattleship;
 use App\Http\Resources\MissileResource;
 use App\Http\Resources\PartieResource;
 use App\Models\BateauAdversaire;
@@ -54,9 +55,13 @@ class PartieController extends Controller
 
     public function fire($id) : MissileResource
     {
+        $targetMode = false;
+        $coordonnee = OffenseBattleship::calculerMeilleurCoup($id, $targetMode);
+
         $tir = CoordonneeBateauAdversaire::create([
-            'coordonnee' => chr(rand(65,74)).'-'.rand(1, 10),
+            'coordonnee' => $coordonnee,
             'partie_id' => $id,
+            'prochain_coup_target_mode' => $targetMode
         ]);
 
         return new MissileResource($tir);

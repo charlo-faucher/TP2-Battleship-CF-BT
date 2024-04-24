@@ -16,6 +16,11 @@ class Partie extends Model
         return $this->HasMany(BateauOrdinateur::class);
     }
 
+    public function bateauxAdversaires() : HasMany
+    {
+        return $this->HasMany(BateauAdversaire::class);
+    }
+
     public function coordonneesBateauxOrdinateur() : HasManyThrough
     {
         return $this->HasManyThrough(CoordonneeBateauOrdinateur::class, BateauOrdinateur::class, 'partie_id', 'bateau_id');
