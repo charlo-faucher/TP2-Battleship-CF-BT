@@ -8,30 +8,44 @@ use App\Models\TypeBateau;
 
 class OffenseBattleship
 {
-    public static function calculerMeilleurCoup(int $partie_id, bool &$prochainTargetMode): string
+    public static function calculerMeilleurCoup(int $partieId): string
     {
-        $partie = Partie::findOrFail($partie_id);
-        $queryTypes = TypeBateau::query()->select('nom', 'taille')->join('bateaux_adversaires', 'bateaux_adversaires.type_id', '=', 'types_bateaux.id')->where('partie_id', $partie->id)->where('est_coule', false);
-        $bateaux_types = $queryTypes->get();
-        $bateaux_tailles = $bateaux_types->pluck('taille')->toArray();
+        // Get les tailles et les noms des bateaux qu'il reste à attaquer.
+        $partie = Partie::findOrFail($partieId);
+        $queryTypes = TypeBateau::query()
+            ->select('nom', 'taille')
+            ->join('bateaux_adversaires', 'bateaux_adversaires.type_id', '=', 'types_bateaux.id')
+            ->where('partie_id', $partie->id);
 
-        // Dictionnaire nom/taille des bateaux
+        // Dictionnaire nom/taille des bateaux.
         // $bateaux = $queryTypes->get()->pluck('taille','nom')->toArray();
 
-        $queryMissiles = CoordonneeBateauAdversaire::query()->where('partie_id', $partie_id);
+        // Get les tailles des bateaux qu'il reste à attaquer.
+        $bateauxTypesPasCoules = $queryTypes->where('est_coule', false)->get();
+        $bateauxTailles = $bateauxTypesPasCoules->pluck('taille')->toArray();
+
+        // Get les coordonnees où l'ordinateur a déjà envoyé des missiles
+        $queryMissiles = CoordonneeBateauAdversaire::query()->where('partie_id', $partieId);
         $missiles = $queryMissiles->get();
+        $nbMissiles = count($queryMissiles->where('resultat', '!=', 0)->get());
 
-        $targetMode = $missiles->last()->prochain_coup_target_mode;
+        $bateauxTypesCoules = $queryTypes->where('est_coule', true)->get();
+        $nbCasesBateauxTouchees = array_sum($bateauxTypesCoules->pluck('taille')->toArray());
+        dd($bateauxTypesCoules->toArray());
 
-        if ($targetMode)
+        // TODO : est_coule = 1 lorsque coule est donné
+        if ($nbCasesBateauxTouchees < $nbMissiles)
         {
-            $prochainTargetMode = true;
+            // Logique du Target mode
+
+           dd($nbBateauxTouchees." - ".$nbMissiles);
             return "A-1";
         }
         else
         {
+            // Logique du Hunt mode
             $missilesDict = $missiles->pluck('resultat', 'coordonnee')->toArray();
-            return OffenseBattleship::huntMode($bateaux_tailles, $missilesDict);
+            return OffenseBattleship::huntMode($bateauxTailles, $missilesDict);
         }
     }
 
@@ -83,7 +97,7 @@ class OffenseBattleship
             }
         }
 
-        OffenseBattleship::debugMap($map);
+        // OffenseBattleship::debugMap($map);
 
         $maxs = array_keys($map, max($map));
         return $maxs[0];

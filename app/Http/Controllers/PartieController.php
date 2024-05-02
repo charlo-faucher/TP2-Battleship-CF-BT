@@ -56,12 +56,11 @@ class PartieController extends Controller
     public function fire($id) : MissileResource
     {
         $targetMode = false;
-        $coordonnee = OffenseBattleship::calculerMeilleurCoup($id, $targetMode);
+        $coordonnee = OffenseBattleship::calculerMeilleurCoup($id);
 
         $tir = CoordonneeBateauAdversaire::create([
             'coordonnee' => $coordonnee,
             'partie_id' => $id,
-            'prochain_coup_target_mode' => $targetMode
         ]);
 
         return new MissileResource($tir);
@@ -73,6 +72,7 @@ class PartieController extends Controller
         $query = CoordonneeBateauAdversaire::query()->where('partie_id',  $partie->id)->where('coordonnee', $coordonnee);
         $coordonnee = $query->get()[0];
         $coordonnee->update(['resultat' => $request->input('resultat')]);
+
         return new MissileResource($coordonnee);
     }
 
