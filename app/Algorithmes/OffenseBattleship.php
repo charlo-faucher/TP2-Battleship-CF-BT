@@ -21,7 +21,8 @@ class OffenseBattleship
         // $bateaux = $queryTypes->get()->pluck('taille','nom')->toArray();
 
         // Get les tailles des bateaux qu'il reste à attaquer.
-        $bateauxTypesPasCoules = $queryTypes->where('est_coule', false)->get();
+        $bateauxTypesPasCoules = (clone $queryTypes)->where('est_coule', false)->get();
+
         $bateauxTailles = $bateauxTypesPasCoules->pluck('taille')->toArray();
 
         // Get les coordonnees où l'ordinateur a déjà envoyé des missiles
@@ -29,17 +30,17 @@ class OffenseBattleship
         $missiles = $queryMissiles->get();
         $nbMissiles = count($queryMissiles->where('resultat', '!=', 0)->get());
 
-        $bateauxTypesCoules = $queryTypes->where('est_coule', true)->get();
+        $bateauxTypesCoules = (clone $queryTypes)->where('est_coule',true)->get();
         $nbCasesBateauxTouchees = array_sum($bateauxTypesCoules->pluck('taille')->toArray());
-        dd($bateauxTypesCoules->toArray());
 
+        //dd($nbCasesBateauxTouchees." - ".$nbMissiles);
         // TODO : est_coule = 1 lorsque coule est donné
         if ($nbCasesBateauxTouchees < $nbMissiles)
         {
             // Logique du Target mode
 
-           dd($nbBateauxTouchees." - ".$nbMissiles);
-            return "A-1";
+           dd($nbCasesBateauxTouchees." - ".$nbMissiles);
+            return "E-6";
         }
         else
         {

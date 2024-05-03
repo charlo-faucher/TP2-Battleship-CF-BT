@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Algorithmes\OffenseBattleship;
+use App\Http\Requests\PartieRequest;
+use App\Http\Requests\ResultatRequest;
 use App\Http\Resources\MissileResource;
 use App\Http\Resources\PartieResource;
 use App\Models\BateauAdversaire;
@@ -11,18 +13,16 @@ use App\Models\CoordonneeBateauAdversaire;
 use App\Models\CoordonneeBateauOrdinateur;
 use App\Models\Partie;
 use App\Models\TypeBateau;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class PartieController extends Controller
 {
-    public function store(Request $request) : PartieResource
+    public function store(PartieRequest $request) : PartieResource
     {
-        $partie = Partie::create([
-                'adversaire' => $request->adversaire,
-            ]
-        );
+        $attributes = $request->validated();
+        $partie = Auth::user()->parties()->create($attributes);
+        //$partie = Partie::create($attributes);
 
         $lettres = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
         $lettreVal = 0;
@@ -53,32 +53,77 @@ class PartieController extends Controller
     }
 
 
-    public function fire($id) : MissileResource
+    public function fire($idPartie) : MissileResource
     {
-        $targetMode = false;
-        $coordonnee = OffenseBattleship::calculerMeilleurCoup($id);
+        $partie = Partie::findOrFail($idPartie);
+
+        Gate::authorize('update', $partie);
+
+        $coordonnee = OffenseBattleship::calculerMeilleurCoup($idPartie);
 
         $tir = CoordonneeBateauAdversaire::create([
             'coordonnee' => $coordonnee,
-            'partie_id' => $id,
+            'partie_id' => $idPartie,
         ]);
 
         return new MissileResource($tir);
     }
 
-    public function resultat(Request $request, $id, $coordonnee) : MissileResource
+    public function resultat(ResultatRequest $request, $idPartie, String $missile) : MissileResource
     {
-        $partie = Partie::findOrFail($id);
-        $query = CoordonneeBateauAdversaire::query()->where('partie_id',  $partie->id)->where('coordonnee', $coordonnee);
-        $coordonnee = $query->get()[0];
-        $coordonnee->update(['resultat' => $request->input('resultat')]);
+        $partie = Partie::findOrFail($idPartie);
+
+        Gate::authorize('update', $partie);
+
+        $attributes = $request->validated();
+
+        $query = CoordonneeBateauAdversaire::query()->where('partie_id',  $idPartie)->where('coordonnee', $missile);
+        $coordonnee = $query->get()->first();
+
+        if ($coordonnee == null)
+        {
+            abort(404);
+        }
+
+        $coordonnee->update($attributes);
+
+        $resultat = $attributes['resultat'];
+        if ($resultat > 1)
+        {
+            switch ($resultat) {
+                case 2:
+                    $nomBateau = "porte-avions";
+                    break;
+                case 3:
+                    $nomBateau = "cuirasse";
+                    break;
+                case 4:
+                    $nomBateau = "destroyer";
+                    break;
+                case 5:
+                    $nomBateau = "sous-marin";
+                    break;
+                case 6:
+                    $nomBateau = "patrouilleur";
+                    break;
+            }
+
+            $bateau = BateauAdversaire::query()->where('partie_id',  $idPartie)->join('types_bateaux', 'type_id', '=', 'types_bateaux.id')->where('types_bateaux.nom', $nomBateau);
+            //dd($bateau->get()->first());
+            $bateau->update(['est_coule' => true]);
+        }
 
         return new MissileResource($coordonnee);
     }
 
-    public function destroy($id) : PartieResource
+    // TODO : Faire bien le delete
+    public function destroy($idPartie) : PartieResource
     {
-        $partie = Partie::findOrFail($id);
+        $partie = Partie::findOrFail($idPartie);
+
+        Gate::authorize('update', $partie);
+
+        $partie = Partie::findOrFail($idPartie);
         $partie->update(['est_finie' => true]);
         return new PartieResource($partie);
     }

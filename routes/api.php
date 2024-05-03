@@ -10,9 +10,10 @@ Route::get('/user', function (Request $request) {
 
 Route::prefix('parties')
     ->controller(PartieController::class)
+    ->middleware(['auth:sanctum'])
     ->group(function () {
         Route::post('/', 'store');
-        Route::post('/{id}/missiles', 'fire');
-        Route::post('/{id}/missiles/{coordonnee}', 'resultat');
-        Route::delete('/{id}', 'destroy');
+        Route::post('/{idPartie}/missiles', 'fire');
+        Route::put('/{idPartie}/missiles/{missile}', 'resultat')->where('missile', '^[A-J]-([1-9]|10)$');;
+        Route::delete('/{idPartie}', 'destroy');
     });
