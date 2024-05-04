@@ -88,18 +88,17 @@ class PartieController extends Controller
             abort(404);
         }
 
-        $coordonnee->update($attributes);
-
         $resultat = $attributes['resultat'];
 
         if ($resultat == 0)
         {
-            $coordonnee->update(['source_id' => null]);
+            $attributes = array_merge($attributes, ['source_id' => null]);
         }
+
+        $coordonnee->update($attributes);
 
         if ($resultat > 1)
         {
-            // TODO : Logique retirer source des bateaux non coules
             $bateau = BateauAdversaire::query()->where('partie_id',  $idPartie)->where('type_id', $resultat - 1)->firstOrFail();
             $bateau->update(['est_coule' => true]);
         }
