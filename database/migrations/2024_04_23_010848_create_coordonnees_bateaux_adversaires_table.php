@@ -15,12 +15,17 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('partie_id');
             $table->string('coordonnee', 4);
+            $table->unsignedBigInteger('source_id')->nullable();
             $table->tinyInteger('resultat')->nullable();
             $table->timestamps();
 
             $table->foreign('partie_id')
                 ->references('id')
                 ->on('parties')
+                ->onDelete('cascade');
+            $table->foreign('source_id')
+                ->references('id')
+                ->on('coordonnees_bateaux_adversaires')
                 ->onDelete('cascade');
         });
     }

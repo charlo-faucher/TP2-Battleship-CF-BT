@@ -8,7 +8,7 @@ use App\Models\TypeBateau;
 
 class OffenseBattleship
 {
-    public static function calculerMeilleurCoup(int $partieId): string
+    public static function calculerMeilleurCoup(int $partieId, ?int &$sourceId): string
     {
         // Get les tailles et les noms des bateaux qu'il reste à attaquer.
         $partie = Partie::findOrFail($partieId);
@@ -17,9 +17,6 @@ class OffenseBattleship
             ->join('bateaux_adversaires', 'bateaux_adversaires.type_id', '=', 'types_bateaux.id')
             ->where('partie_id', $partie->id);
 
-        // Dictionnaire nom/taille des bateaux.
-        // $bateaux = $queryTypes->get()->pluck('taille','nom')->toArray();
-
         // Get les tailles des bateaux qu'il reste à attaquer.
         $bateauxTypesPasCoules = (clone $queryTypes)->where('est_coule', false)->get();
 
@@ -27,20 +24,64 @@ class OffenseBattleship
 
         // Get les coordonnees où l'ordinateur a déjà envoyé des missiles
         $queryMissiles = CoordonneeBateauAdversaire::query()->where('partie_id', $partieId);
-        $missiles = $queryMissiles->get();
-        $nbMissiles = count($queryMissiles->where('resultat', '!=', 0)->get());
+        $missiles = (clone $queryMissiles)->get();
 
+        // Get les missiles qui ont touchés ou coulés un bateau + le nombre
+        $missilesTouches = (clone $queryMissiles)->where('resultat', '!=', 0)->get();
+        $nbMissiles = count($missilesTouches);
+
+        // Get les types des bateaux déjà coulés
         $bateauxTypesCoules = (clone $queryTypes)->where('est_coule',true)->get();
-        $nbCasesBateauxTouchees = array_sum($bateauxTypesCoules->pluck('taille')->toArray());
 
-        //dd($nbCasesBateauxTouchees." - ".$nbMissiles);
-        // TODO : est_coule = 1 lorsque coule est donné
-        if ($nbCasesBateauxTouchees < $nbMissiles)
-        {
-            // Logique du Target mode
+        if (array_sum($bateauxTypesCoules->pluck('taille')->toArray()) < $nbMissiles) {
+            $dernierMissileTouche = new CoordonneeBateauAdversaire($missilesTouches->last()->toArray());
 
-           dd($nbCasesBateauxTouchees." - ".$nbMissiles);
-            return "E-6";
+            $missilesCoord = $missiles->pluck('coordonnee')->toArray();
+
+            $dernierMissileCoord = explode('-', $dernierMissileTouche->coordonnee);
+            $dernierMissileCoordCol = ord($dernierMissileCoord[0]);
+            $dernierMissileCoordRow = intval($dernierMissileCoord[1]);
+
+            if ($missilesTouches->last()->source_id != null)
+            {
+                // Logique si prochain missile
+
+                $missileSource = $dernierMissileTouche->source;
+                $missileSourceCoord = explode('-',$missileSource->coordonnee);
+                $missileSourceCoordCol = ord($missileSourceCoord[0]);
+                $missileSourceCoordRow = intval($missileSourceCoord[1]);
+
+                $vertical = $dernierMissileCoordCol <=> $missileSourceCoordCol;
+                $horizontal = $dernierMissileCoordRow <=> $missileSourceCoordRow;
+
+                $nouveauVertical = $dernierMissileCoordCol + $vertical;
+                $nouveauHorizontal = $dernierMissileCoordRow + $horizontal;
+                $nouvelleCoord =  chr($nouveauVertical).'-'.($nouveauHorizontal);
+
+                if (!in_array($nouvelleCoord, $missilesCoord) && (65 <= $nouveauVertical && $nouveauVertical < 65 + 10) && (1 <= $nouveauHorizontal && $nouveauHorizontal <= 10))
+                {
+                    $sourceId = $dernierMissileTouche->source_id ?? $missiles->where('coordonnee', $dernierMissileTouche->coordonnee)->last()->id;
+                    return $nouvelleCoord;
+                }
+            }
+
+            $ordre = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+
+            $missile = $dernierMissileTouche->source_id == null ? $dernierMissileTouche : $dernierMissileTouche->source;
+            $missileCoord = explode('-', $missile->coordonnee);
+            $missileCoordCol = ord($missileCoord[0]);
+            $missileCoordRow = intval($missileCoord[1]);
+            foreach ($ordre as $sens)
+            {
+                $nouvelleCoord = chr($missileCoordCol + $sens[0]).'-'.($missileCoordRow + $sens[1]);
+                // TODO : Regarder meilleur sens possible selon bateaux restants
+                if (!in_array($nouvelleCoord, $missilesCoord)) {
+                    $sourceId =$missiles->where('coordonnee', $missile->coordonnee)->last()->id;
+                    return $nouvelleCoord;
+                }
+            }
+
+            dd("fail");
         }
         else
         {
@@ -98,7 +139,7 @@ class OffenseBattleship
             }
         }
 
-        // OffenseBattleship::debugMap($map);
+        //OffenseBattleship::debugMap($map);
 
         $maxs = array_keys($map, max($map));
         return $maxs[0];

@@ -59,11 +59,14 @@ class PartieController extends Controller
 
         Gate::authorize('update', $partie);
 
-        $coordonnee = OffenseBattleship::calculerMeilleurCoup($idPartie);
+        $idSource = null;
+        $coordonnee = OffenseBattleship::calculerMeilleurCoup($idPartie, $idSource);
+        dd($coordonnee);
 
         $tir = CoordonneeBateauAdversaire::create([
             'coordonnee' => $coordonnee,
             'partie_id' => $idPartie,
+            'source_id' => $idSource
         ]);
 
         return new MissileResource($tir);
@@ -88,6 +91,12 @@ class PartieController extends Controller
         $coordonnee->update($attributes);
 
         $resultat = $attributes['resultat'];
+
+        if ($resultat == 0)
+        {
+            $coordonnee->update(['source_id' => null]);
+        }
+
         if ($resultat > 1)
         {
             switch ($resultat) {
@@ -109,7 +118,6 @@ class PartieController extends Controller
             }
 
             $bateau = BateauAdversaire::query()->where('partie_id',  $idPartie)->join('types_bateaux', 'type_id', '=', 'types_bateaux.id')->where('types_bateaux.nom', $nomBateau);
-            //dd($bateau->get()->first());
             $bateau->update(['est_coule' => true]);
         }
 
