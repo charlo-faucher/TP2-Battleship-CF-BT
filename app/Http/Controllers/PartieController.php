@@ -61,7 +61,7 @@ class PartieController extends Controller
 
         $idSource = null;
         $coordonnee = OffenseBattleship::calculerMeilleurCoup($idPartie, $idSource);
-        dd($coordonnee);
+        //dd($coordonnee);
 
         $tir = CoordonneeBateauAdversaire::create([
             'coordonnee' => $coordonnee,
@@ -116,6 +116,8 @@ class PartieController extends Controller
                     $nomBateau = "patrouilleur";
                     break;
             }
+
+            // TODO : Logique retirer source des bateaux non coules
 
             $bateau = BateauAdversaire::query()->where('partie_id',  $idPartie)->join('types_bateaux', 'type_id', '=', 'types_bateaux.id')->where('types_bateaux.nom', $nomBateau);
             $bateau->update(['est_coule' => true]);

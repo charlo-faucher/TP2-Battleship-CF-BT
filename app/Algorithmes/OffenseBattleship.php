@@ -25,6 +25,7 @@ class OffenseBattleship
         // Get les coordonnees où l'ordinateur a déjà envoyé des missiles
         $queryMissiles = CoordonneeBateauAdversaire::query()->where('partie_id', $partieId);
         $missiles = (clone $queryMissiles)->get();
+        dd($missiles);
 
         // Get les missiles qui ont touchés ou coulés un bateau + le nombre
         $missilesTouches = (clone $queryMissiles)->where('resultat', '!=', 0)->get();
@@ -35,17 +36,15 @@ class OffenseBattleship
 
         if (array_sum($bateauxTypesCoules->pluck('taille')->toArray()) < $nbMissiles) {
             $dernierMissileTouche = new CoordonneeBateauAdversaire($missilesTouches->last()->toArray());
-
+            $dernierMissileTouche = $dernierMissileTouche->resultat > 1 ? $missilesTouches->toQuery()->where('source_id', null)->doesntHave('casesEnfants')->first() : $dernierMissileTouche;
             $missilesCoord = $missiles->pluck('coordonnee')->toArray();
 
             $dernierMissileCoord = explode('-', $dernierMissileTouche->coordonnee);
             $dernierMissileCoordCol = ord($dernierMissileCoord[0]);
             $dernierMissileCoordRow = intval($dernierMissileCoord[1]);
 
-            if ($missilesTouches->last()->source_id != null)
+            if ($missilesTouches->last()->source_id != null && $missilesTouches->last()->resultat <= 1)
             {
-                // Logique si prochain missile
-
                 $missileSource = $dernierMissileTouche->source;
                 $missileSourceCoord = explode('-',$missileSource->coordonnee);
                 $missileSourceCoordCol = ord($missileSourceCoord[0]);
@@ -65,23 +64,28 @@ class OffenseBattleship
                 }
             }
 
-            $ordre = [[-1, 0], [1, 0], [0, -1], [0, 1]];
-
             $missile = $dernierMissileTouche->source_id == null ? $dernierMissileTouche : $dernierMissileTouche->source;
             $missileCoord = explode('-', $missile->coordonnee);
             $missileCoordCol = ord($missileCoord[0]);
             $missileCoordRow = intval($missileCoord[1]);
+
+            $ordre = [[-1, 0], [1, 0], [0, -1], [0, 1]];
             foreach ($ordre as $sens)
             {
-                $nouvelleCoord = chr($missileCoordCol + $sens[0]).'-'.($missileCoordRow + $sens[1]);
+                $nouveauVertical = $missileCoordCol + $sens[0];
+                $nouveauHorizontal = $missileCoordRow + $sens[1];
+                $nouvelleCoord = chr($nouveauVertical).'-'.($nouveauHorizontal);
                 // TODO : Regarder meilleur sens possible selon bateaux restants
-                if (!in_array($nouvelleCoord, $missilesCoord)) {
+                if (!in_array($nouvelleCoord, $missilesCoord) && (65 <= $nouveauVertical && $nouveauVertical < 65 + 10) && (1 <= $nouveauHorizontal && $nouveauHorizontal <= 10)) {
                     $sourceId =$missiles->where('coordonnee', $missile->coordonnee)->last()->id;
                     return $nouvelleCoord;
                 }
             }
 
-            dd("fail");
+            // Ne devrait jamais arriver ici, mais retarget une cible déjà touchée pour ne pas crash
+
+            //dd("fail");
+            return $missilesTouches->first();
         }
         else
         {
@@ -142,7 +146,7 @@ class OffenseBattleship
         //OffenseBattleship::debugMap($map);
 
         $maxs = array_keys($map, max($map));
-        return $maxs[0];
+        return $maxs[array_rand($maxs)];
     }
 
     private static function initialiserMap() : array
