@@ -99,27 +99,8 @@ class PartieController extends Controller
 
         if ($resultat > 1)
         {
-            switch ($resultat) {
-                case 2:
-                    $nomBateau = "porte-avions";
-                    break;
-                case 3:
-                    $nomBateau = "cuirasse";
-                    break;
-                case 4:
-                    $nomBateau = "destroyer";
-                    break;
-                case 5:
-                    $nomBateau = "sous-marin";
-                    break;
-                case 6:
-                    $nomBateau = "patrouilleur";
-                    break;
-            }
-
             // TODO : Logique retirer source des bateaux non coules
-
-            $bateau = BateauAdversaire::query()->where('partie_id',  $idPartie)->join('types_bateaux', 'type_id', '=', 'types_bateaux.id')->where('types_bateaux.nom', $nomBateau);
+            $bateau = BateauAdversaire::query()->where('partie_id',  $idPartie)->where('type_id', $resultat - 1)->firstOrFail();
             $bateau->update(['est_coule' => true]);
         }
 

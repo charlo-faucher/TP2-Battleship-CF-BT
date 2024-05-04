@@ -25,7 +25,6 @@ class OffenseBattleship
         // Get les coordonnees où l'ordinateur a déjà envoyé des missiles
         $queryMissiles = CoordonneeBateauAdversaire::query()->where('partie_id', $partieId);
         $missiles = (clone $queryMissiles)->get();
-        dd($missiles);
 
         // Get les missiles qui ont touchés ou coulés un bateau + le nombre
         $missilesTouches = (clone $queryMissiles)->where('resultat', '!=', 0)->get();
