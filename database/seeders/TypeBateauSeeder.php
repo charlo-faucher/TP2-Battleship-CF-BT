@@ -3,9 +3,11 @@
 namespace Database\Seeders;
 
 use App\Models\TypeBateau;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
+/**
+ * Seeder des types de bateaux.
+ */
 class TypeBateauSeeder extends Seeder
 {
     /**

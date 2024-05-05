@@ -49,6 +49,9 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * @return HasMany Parties lancées par l'utilisateur.
+     */
     public function parties():HasMany
     {
         return $this->HasMany(Partie::class);
