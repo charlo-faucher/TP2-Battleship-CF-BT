@@ -43,14 +43,20 @@ class OffenseBattleship
             if ($dernierMissileTouche->resultat > 1)
             {
                 $bateauxTypesTaillesAvecID = (clone $queryTypes)->get()->pluck('taille', 'id')->toArray();
-                $sources = $missilesTouches->toQuery()->has('casesEnfants')->get();
+                $sources = $missilesTouches->toQuery()->has('casesEnfants')->where('resultat', '!=', '0')->get();
 
                 foreach ($sources as $source) {
-                    $sourceBateau = $source->casesEnfants->where('resultat', '>' , 1)->firstOrFail();
+                    $sourceBateau = $source->casesEnfants->where('resultat', '>' , 1)->first();
 
-                    if ($source->casesEnfants->count() >= $bateauxTypesTaillesAvecID[$sourceBateau->resultat - 1]) {
-                        $premierMissile = $source->casesEnfants->firstOrFail();
-                        $dernierMissile = $source->casesEnfants->last();
+                    if ($sourceBateau == null) {
+                        $missileDeRepere = $source->casesEnfants->last()->source;
+                        break;
+                    }
+
+
+                    if ($source->casesEnfants->toQuery()->where('resultat', '!=', '0')->count() >= $bateauxTypesTaillesAvecID[$sourceBateau->resultat - 1]) {
+                        $premierMissile = $source->casesEnfants->where('resultat', '!=', '0')->firstOrFail();
+                        $dernierMissile = $source->casesEnfants->where('resultat', '!=', '0')->last();
                         $sourceMissileCoord = explode('-', $source);
                         $premierMissileCoord = explode('-', $premierMissile);
                         $dernierMissileCoord = explode('-', $dernierMissile);
@@ -68,7 +74,7 @@ class OffenseBattleship
                         }
                         else
                         {
-                            $missileDeRepere = $source->casesEnfants->firstOrFail();
+                            $missileDeRepere = $premierMissile;
                         }
 
                         $missileDeRepere->update(['source_id' => null]);

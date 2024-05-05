@@ -88,14 +88,9 @@ class PartieController extends Controller
             abort(404);
         }
 
-        $resultat = $attributes['resultat'];
-
-        if ($resultat == 0)
-        {
-            $attributes = array_merge($attributes, ['source_id' => null]);
-        }
-
         $coordonnee->update($attributes);
+
+        $resultat = $attributes['resultat'];
 
         if ($resultat > 1)
         {
