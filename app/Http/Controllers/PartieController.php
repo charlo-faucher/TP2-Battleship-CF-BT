@@ -77,20 +77,21 @@ class PartieController extends Controller
 
         $attributes = $request->validated();
 
-        $query = CoordonneeBateauAdversaire::query()->where('partie_id',  $idPartie)->where('coordonnee', $missile);
+        $query = CoordonneeBateauAdversaire::query()->where('partie_id', $idPartie)->where('coordonnee', $missile);
         $coordonnee = $query->get()->first();
 
-        if ($coordonnee == null)
-        {
+        if ($coordonnee == null) {
             abort(404);
         }
 
         $coordonnee->update($attributes);
         $resultat = $attributes['resultat'];
 
-        if ($resultat > 1)
-        {
-            $bateau = BateauAdversaire::query()->where('partie_id',  $idPartie)->where('type_id', $resultat - 1)->firstOrFail();
+        if ($resultat > 1) {
+            $bateau = BateauAdversaire::query()
+                ->where('partie_id', $idPartie)
+                ->where('type_id', $resultat - 1)
+                ->firstOrFail();
             $bateau->update(['est_coule' => true]);
         }
 

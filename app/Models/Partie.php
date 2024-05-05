@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpCSValidationInspection */
 
 namespace App\Models;
 
@@ -37,7 +37,12 @@ class Partie extends Model
      */
     public function coordonneesBateauxOrdinateur() : HasManyThrough
     {
-        return $this->HasManyThrough(CoordonneeBateauOrdinateur::class, BateauOrdinateur::class, 'partie_id', 'bateau_id');
+        return $this->HasManyThrough(
+            CoordonneeBateauOrdinateur::class,
+            BateauOrdinateur::class,
+            'partie_id',
+            'bateau_id'
+        );
     }
 
     /**

@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\Partie;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 /**
  * Classe pour les policies d'une partie.

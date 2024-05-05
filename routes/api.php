@@ -14,6 +14,6 @@ Route::prefix('parties')
     ->group(function () {
         Route::post('/', 'store');
         Route::post('/{idPartie}/missiles', 'fire');
-        Route::put('/{idPartie}/missiles/{missile}', 'resultat')->where('missile', '^[A-J]-([1-9]|10)$');;
+        Route::put('/{idPartie}/missiles/{missile}', 'resultat')->where('missile', '^[A-J]-([1-9]|10)$');
         Route::delete('/{idPartie}', 'destroy');
     });

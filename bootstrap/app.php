@@ -32,7 +32,6 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $exceptions->render(function (AccessDeniedHttpException $e, Request $request) {
             if ($request->is('battleship-ia/*')) {
-
                 return response()->json([
                     'message' => trans('errors.403')
                 ], 403);

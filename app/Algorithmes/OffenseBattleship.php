@@ -43,13 +43,11 @@ class OffenseBattleship
         $nbMissiles = count($missilesTouches);
 
         // Get les types des bateaux déjà coulés
-        $bateauxTypesCoules = (clone $queryTypes)->where('est_coule',true)->get();
+        $bateauxTypesCoules = (clone $queryTypes)->where('est_coule', true)->get();
 
         if (array_sum($bateauxTypesCoules->pluck('taille')->toArray()) < $nbMissiles) {
             return OffenseBattleship::targetMode($missilesTouches, $missiles, $queryTypes, $sourceId);
-        }
-        else
-        {
+        } else {
             // Logique du Hunt mode
             $missilesDict = $missiles->pluck('resultat', 'coordonnee')->toArray();
             $bateauxTailles = $bateauxTypesPasCoules->pluck('taille')->toArray();
@@ -60,13 +58,17 @@ class OffenseBattleship
     /**
      * Mode de ciblage pour détruire le(s) bateau(x) qu'il reste à couler.
      *
-     * @param Collection $missilesTouches Missile qui ont touché un bateau.
-     * @param Collection $missiles Missiles précédents.
+     * @param Builder|Collection $missilesTouches Missile qui ont touché un bateau.
+     * @param Builder|Collection $missiles Missiles précédents.
      * @param Builder $queryTypes Types de bateaux.
      * @return string Coordonnée à attaquer.
      */
-    public static function targetMode(Collection $missilesTouches, Collection $missiles, Builder $queryTypes, ?int &$sourceId): string
-    {
+    public static function targetMode(
+        Builder|Collection $missilesTouches,
+        Builder|Collection $missiles,
+        Builder            $queryTypes,
+        ?int               &$sourceId
+    ): string {
         $dernierMissileTouche = new CoordonneeBateauAdversaire($missilesTouches->last()->toArray());
         $missilesCoord = $missiles->pluck('coordonnee')->toArray();
 
@@ -84,19 +86,35 @@ class OffenseBattleship
                     break;
                 }
 
-                if ($source->casesEnfants->toQuery()->where('resultat', '!=', '0')->count() >= $bateauxTypesTaillesAvecID[$sourceBateau->resultat - 1]) {
+                if ($source->casesEnfants->toQuery()->where('resultat', '!=', '0')->count()
+                    >= $bateauxTypesTaillesAvecID[$sourceBateau->resultat - 1]) {
                     $premierMissile = $source->casesEnfants->where('resultat', '!=', '0')->firstOrFail();
                     $dernierMissile = $source->casesEnfants->where('resultat', '!=', '0')->last();
 
                     $sourceMissileCoord = explode('-', $source);
                     $premierMissileCoord = explode('-', $premierMissile);
                     $dernierMissileCoord = explode('-', $dernierMissile);
-                    [$sourceMissileCol, $sourceMissileRow] = [ord($sourceMissileCoord[0]), intval($sourceMissileCoord[1])];
-                    [$premierMissileCol, $premierMissileRow] = [ord($premierMissileCoord[0]), intval($premierMissileCoord[1])];
-                    [$dernierMissileCol, $dernierMissileRow] = [ord($dernierMissileCoord[0]), intval($dernierMissileCoord[1])];
+                    [$sourceMissileCol, $sourceMissileRow] = [
+                        ord($sourceMissileCoord[0]),
+                        intval($sourceMissileCoord[1])
+                    ];
+                    [$premierMissileCol, $premierMissileRow] = [
+                        ord($premierMissileCoord[0]),
+                        intval($premierMissileCoord[1])
+                    ];
+                    [$dernierMissileCol, $dernierMissileRow] = [
+                        ord($dernierMissileCoord[0]),
+                        intval($dernierMissileCoord[1])
+                    ];
 
-                    $directionPremier = [$premierMissileCol <=> $sourceMissileCol, $premierMissileRow <=> $sourceMissileRow];
-                    $directionDernier = [$dernierMissileCol <=> $sourceMissileCol, $dernierMissileRow <=> $sourceMissileRow];
+                    $directionPremier = [
+                        $premierMissileCol <=> $sourceMissileCol,
+                        $premierMissileRow <=> $sourceMissileRow
+                    ];
+                    $directionDernier = [
+                        $dernierMissileCol <=> $sourceMissileCol,
+                        $dernierMissileRow <=> $sourceMissileRow
+                    ];
 
                     $missileDeRepere = $directionPremier === $directionDernier ? $source : $premierMissile;
 
@@ -115,7 +133,10 @@ class OffenseBattleship
             $missileDeRepere = $missileSource;
 
             $missileSourceCoord = explode('-', $missileSource->coordonnee);
-            [$missileSourceCoordCol, $missileSourceCoordRow] = [ord($missileSourceCoord[0]), intval($missileSourceCoord[1])];
+            [$missileSourceCoordCol, $missileSourceCoordRow] = [
+                ord($missileSourceCoord[0]),
+                intval($missileSourceCoord[1])
+            ];
 
             $vertical = $dernierMissileCoordCol <=> $missileSourceCoordCol;
             $horizontal = $dernierMissileCoordRow <=> $missileSourceCoordRow;
@@ -127,7 +148,8 @@ class OffenseBattleship
             if (!in_array($nouvelleCoord, $missilesCoord)
                 && (65 <= $nouveauVertical && $nouveauVertical < 65 + 10)
                 && (1 <= $nouveauHorizontal && $nouveauHorizontal <= 10)) {
-                $sourceId = $missileDeRepere->source_id ?? $missiles->where('coordonnee', $missileDeRepere->coordonnee)->last()->id;
+                $sourceId = $missileDeRepere->source_id
+                    ?? $missiles->where('coordonnee', $missileDeRepere->coordonnee)->last()->id;
 
                 return $nouvelleCoord;
             }
@@ -144,8 +166,10 @@ class OffenseBattleship
             $nouveauHorizontal = $missileCoordRow + $sens[1];
             $nouvelleCoord = chr($nouveauVertical) . '-' . ($nouveauHorizontal);
 
-            // TODO : Regarder meilleur sens possible selon bateaux restants
-            if (!in_array($nouvelleCoord, $missilesCoord) && (65 <= $nouveauVertical && $nouveauVertical < 65 + 10) && (1 <= $nouveauHorizontal && $nouveauHorizontal <= 10)) {
+            // TODO si possible : Regarder meilleur sens possible selon bateaux restants
+            if (!in_array($nouvelleCoord, $missilesCoord)
+                && (65 <= $nouveauVertical && $nouveauVertical < 65 + 10)
+                && (1 <= $nouveauHorizontal && $nouveauHorizontal <= 10)) {
                 $sourceId = $missiles->where('coordonnee', $missile->coordonnee)->last()->id;
 
                 return $nouvelleCoord;
@@ -252,8 +276,12 @@ class OffenseBattleship
      * @param bool $estHorizontal Si la direction est horizontale.
      * @return bool Si le bateau peut être placé.
      */
-    private static function verifierPositionBateauPossible(int $taille, string $position, array $missiles, bool $estHorizontal) : bool
-    {
+    private static function verifierPositionBateauPossible(
+        int $taille,
+        string $position,
+        array $missiles,
+        bool $estHorizontal
+    ) : bool {
         if (array_key_exists($position, $missiles)) {
             return false;
         }
@@ -266,8 +294,13 @@ class OffenseBattleship
         }
 
         for ($i = 1; $i < $taille; $i++) {
-            if (array_key_exists(chr(($estHorizontal ? 0 : $i) + $col) . '-' . ($row + ($estHorizontal ? $i : 0)), $missiles))
-            {
+            if (array_key_exists(
+                chr(
+                    ($estHorizontal ? 0 : $i) + $col
+                ) . '-' . ($row + ($estHorizontal ? $i : 0)),
+                $missiles
+            )
+            ) {
                 return false;
             }
         }

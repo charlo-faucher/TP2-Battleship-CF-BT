@@ -2,8 +2,6 @@
 
 namespace App\Http\Resources;
 
-use App\Models\BateauOrdinateur;
-use App\Models\TypeBateau;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -27,8 +25,7 @@ class PartieResource extends JsonResource
             $bateauxPositions[$bateau->type->nom] = $bateau->coordonnees->pluck('coordonnee')->toArray();
         }
 
-        if ($this->est_finie == 1)
-        {
+        if ($this->est_finie == 1) {
             $this->delete();
         }
 

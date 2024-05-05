@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpCSValidationInspection */
 
 namespace App\Algorithmes;
 
@@ -36,11 +36,13 @@ class DefensiveBattleship
             ]);
 
             $bateauModele = new BateauOrdinateur($bateau->toArray());
-            $bateaux[$bateauModele->type->nom] = ['id' => $bateau->id, 'taille' => $bateauModele->type->taille, 'bateau' => $bateauModele];
+            $bateaux[$bateauModele->type->nom] = [
+                'id' => $bateau->id, 'taille' => $bateauModele->type->taille,
+                'bateau' => $bateauModele
+            ];
         }
 
-        switch (rand(1, 2))
-        {
+        switch (rand(1, 2)) {
             case 1:
                 DefensiveBattleship::strategieBordures($bateaux);
                 break;
