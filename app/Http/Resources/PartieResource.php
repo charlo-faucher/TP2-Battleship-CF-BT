@@ -7,6 +7,11 @@ use App\Models\TypeBateau;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * Ressource d'une partie.
+ *
+ * @author Charles-Olivier Faucher et Benjamin Theriault
+ */
 class PartieResource extends JsonResource
 {
     /**

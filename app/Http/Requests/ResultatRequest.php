@@ -4,6 +4,11 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * Classe de validation d'un résultat.
+ *
+ * @author Charles-Olivier Faucher et Benjamin Theriault
+ */
 class ResultatRequest extends FormRequest
 {
     /**

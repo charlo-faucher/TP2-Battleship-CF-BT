@@ -10,6 +10,8 @@ use App\Models\TypeBateau;
 
 /**
  * Classe pour la défense des bateaux (placement des bateaux).
+ *
+ * @author Charles-Olivier Faucher et Benjamin Theriault
  */
 class DefensiveBattleship
 {
@@ -18,8 +20,6 @@ class DefensiveBattleship
      *
      * @param Partie $partie - Partie à débuter
      * @return void
-     *
-     * @author Charles-Olivier Faucher & Benjamin Theriault
      */
     public static function creerBateaux(Partie $partie) : void
     {

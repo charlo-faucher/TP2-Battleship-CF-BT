@@ -4,6 +4,11 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * Classe de validation d'une partie.
+ *
+ * @author Charles-Olivier Faucher et Benjamin Theriault
+ */
 class PartieRequest extends FormRequest
 {
     /**
