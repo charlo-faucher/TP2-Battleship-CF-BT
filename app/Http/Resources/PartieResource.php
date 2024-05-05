@@ -22,6 +22,11 @@ class PartieResource extends JsonResource
             $bateauxPositions[$bateau->type->nom] = $bateau->coordonnees->pluck('coordonnee')->toArray();
         }
 
+        if ($this->est_finie == 1)
+        {
+            $this->delete();
+        }
+
         return [
             'id' => $this->id,
             'adversaire' => $this->adversaire,

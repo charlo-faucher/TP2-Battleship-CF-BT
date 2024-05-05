@@ -110,6 +110,7 @@ class PartieController extends Controller
 
         $partie = Partie::findOrFail($idPartie);
         $partie->update(['est_finie' => true]);
+
         return new PartieResource($partie);
     }
 }
