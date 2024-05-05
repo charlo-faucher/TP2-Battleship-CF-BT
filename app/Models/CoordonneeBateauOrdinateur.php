@@ -13,6 +13,6 @@ class CoordonneeBateauOrdinateur extends Model
 
     public function bateauOrdinateur() : BelongsTo
     {
-        return $this->belongsTo(BateauOrdinateur::class);
+        return $this->belongsTo(BateauOrdinateur::class, 'bateau_id');
     }
 }

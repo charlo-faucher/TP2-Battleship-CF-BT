@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 class BateauOrdinateur extends Pivot
 {
     protected $table = 'bateaux_ordinateur';
+
+    public $incrementing = true;
     protected $fillable = ['partie_id', 'type_id'];
 
     public function partie() : BelongsTo
@@ -23,6 +25,6 @@ class BateauOrdinateur extends Pivot
 
     public function coordonnees() : HasMany
     {
-        return  $this->hasMany(CoordonneeBateauOrdinateur::class, 'bateau_id', 'id');
+        return $this->hasMany(CoordonneeBateauOrdinateur::class, 'bateau_id', 'id');
     }
 }

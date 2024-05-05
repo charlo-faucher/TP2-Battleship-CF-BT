@@ -38,7 +38,6 @@ class PartieController extends Controller
 
         $idSource = null;
         $coordonnee = OffenseBattleship::calculerMeilleurCoup($idPartie, $idSource);
-        //dd($coordonnee);
 
         $tir = CoordonneeBateauAdversaire::create([
             'coordonnee' => $coordonnee,
