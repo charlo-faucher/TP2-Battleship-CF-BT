@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Algorithmes\DefensiveBattleship;
 use App\Algorithmes\OffenseBattleship;
 use App\Http\Requests\PartieRequest;
 use App\Http\Requests\ResultatRequest;
@@ -22,32 +23,8 @@ class PartieController extends Controller
     {
         $attributes = $request->validated();
         $partie = Auth::user()->parties()->create($attributes);
-        //$partie = Partie::create($attributes);
 
-        $lettres = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
-        $lettreVal = 0;
-        foreach (TypeBateau::all() as $typeBateau) {
-            BateauOrdinateur::create([
-                'partie_id' => $partie->id,
-                'type_id' => $typeBateau->id
-            ]);
-
-            BateauAdversaire::create([
-                'partie_id' => $partie->id,
-                'type_id' => $typeBateau->id
-            ]);
-
-            $query = BateauOrdinateur::query()->where('partie_id',  $partie->id)->where('type_id',  $typeBateau->id);
-            $bateau = $query->get()[0];
-
-            for ($i = 0; $i < $typeBateau->taille; $i++) {
-                CoordonneeBateauOrdinateur::create([
-                    'coordonnee' => $lettres[$lettreVal].'-'.($i + 1),
-                    'bateau_id' => $bateau->id
-                ]);
-            }
-            ++$lettreVal;
-        }
+        DefensiveBattleship::creerBateaux($partie);
 
         return new PartieResource($partie);
     }
@@ -101,7 +78,6 @@ class PartieController extends Controller
         return new MissileResource($coordonnee);
     }
 
-    // TODO : Faire bien le delete
     public function destroy($idPartie) : PartieResource
     {
         $partie = Partie::findOrFail($idPartie);
