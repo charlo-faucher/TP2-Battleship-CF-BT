@@ -73,7 +73,7 @@ class DefensiveBattleship
     private static function strategieBordures(array $bateaux) : void
     {
         $bateauxGauche = [$bateaux['patrouilleur'], $bateaux['porte-avions'], $bateaux['cuirasse']];
-        $positionsGauche = [['A', 'B'], ['E', 'F'], ['I', 'K']];
+        $positionsGauche = [['A', 'B'], ['E', 'F'], ['I', 'J']];
 
         shuffle($bateauxGauche);
 
